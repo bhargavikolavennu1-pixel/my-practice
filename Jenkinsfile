@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "Jobportal-demo-image"
+        IMAGE_NAME = "jobportal-demo-image"
         CONTAINER_NAME = "Jobportal-demo-container"
     }
 
