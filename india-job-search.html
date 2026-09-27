@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naukri Chart — Job Search, India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3EEE1;
+    --paper-2:#EAE3D1;
+    --ink:#1C2B39;
+    --ink-soft:#3C4C5C;
+    --rail-green:#2F6E4E;
+    --rail-green-dark:#1F4E36;
+    --maroon:#8C2F39;
+    --maroon-dark:#6B222A;
+    --marigold:#E0A458;
+    --marigold-dark:#B87F36;
+    --line:#C9BFA0;
+    --white:#FFFDF8;
+    --shadow:rgba(28,43,57,0.14);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(28,43,57,0.02) 0px, rgba(28,43,57,0.02) 1px, transparent 1px, transparent 3px);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    padding-bottom:4rem;
+  }
+
+  a{ color:inherit; }
+
+  /* ---------- HEADER / DEPARTURE BOARD ---------- */
+  header.board{
+    background:var(--ink);
+    color:var(--marigold);
+    padding:1.1rem 1.5rem;
+    position:sticky;
+    top:0;
+    z-index:40;
+    box-shadow:0 4px 14px var(--shadow);
+  }
+  .board-top{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:.6rem;
+  }
+  .brand-mark{
+    font-family:'Special Elite', monospace;
+    font-size:1.5rem;
+    letter-spacing:.03em;
+  }
+  .brand-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.7rem;
+    color:#C9C2A8;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  .board-stats{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    color:#D8CFB2;
+    display:flex;
+    gap:1.2rem;
+  }
+  .board-stats b{ color:var(--marigold); }
+
+  .ticker{
+    max-width:1180px;
+    margin:.85rem auto 0;
+    overflow:hidden;
+    white-space:nowrap;
+    border-top:1px dashed #4A5C6C;
+    padding-top:.6rem;
+  }
+  .ticker-track{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    color:#E7DFC4;
+    animation:scroll-left 32s linear infinite;
+    padding-left:100%;
+  }
+  .ticker-track span{ margin-right:2.5rem; }
+  .ticker-track span::before{ content:"▸ "; color:var(--marigold); }
+  @keyframes scroll-left{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-100%); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{ animation:none; padding-left:0; }
+  }
+
+  /* ---------- MAIN ---------- */
+  main{
+    max-width:1180px;
+    margin:2rem auto 0;
+    padding:0 1.5rem;
+  }
+
+  .counter{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.4rem 1.5rem 1.6rem;
+    box-shadow:0 2px 10px var(--shadow);
+    position:relative;
+  }
+  .counter::before{
+    content:"BOOKING COUNTER";
+    position:absolute;
+    top:-.7rem;
+    left:1.4rem;
+    background:var(--marigold);
+    color:#412402;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.68rem;
+    letter-spacing:.14em;
+    padding:.25rem .6rem;
+    border-radius:4px;
+    font-weight:600;
+  }
+
+  .search-row{
+    display:flex;
+    gap:.7rem;
+    margin-bottom:1rem;
+  }
+  .search-row input[type="text"]{
+    flex:1;
+    font-size:1rem;
+  }
+  input[type="text"], select{
+    font-family:'IBM Plex Sans', sans-serif;
+    padding:.65rem .8rem;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    font-size:.9rem;
+  }
+  input[type="text"]:focus, select:focus, button:focus-visible, .job-ticket:focus-visible, .chip:focus-visible{
+    outline:3px solid var(--marigold);
+    outline-offset:1px;
+  }
+  .search-row button{
+    background:var(--rail-green);
+    color:var(--white);
+    border:none;
+    border-radius:6px;
+    padding:.65rem 1.3rem;
+    font-weight:600;
+    font-size:.92rem;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .search-row button:hover{ background:var(--rail-green-dark); }
+
+  .filters{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:.7rem;
+  }
+  @media (max-width:900px){
+    .filters{ grid-template-columns:repeat(2, 1fr); }
+    .search-row{ flex-direction:column; }
+  }
+  .filters label{
+    display:flex;
+    flex-direction:column;
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    font-weight:600;
+    gap:.3rem;
+  }
+
+  .chips{
+    margin-top:1rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+  }
+  .chip{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:.78rem;
+    padding:.35rem .7rem;
+    border-radius:999px;
+    cursor:pointer;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .chip.active{
+    background:var(--ink);
+    color:var(--marigold);
+    border-color:var(--ink);
+  }
+
+  /* ---------- CHART HEADER ---------- */
+  .chart-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin:2rem 0 1rem;
+    flex-wrap:wrap;
+    gap:.5rem;
+  }
+  .chart-head h2{
+    font-family:'Special Elite', monospace;
+    font-size:1.15rem;
+    margin:0;
+    letter-spacing:.02em;
+  }
+  .chart-head .count{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--ink-soft);
+    font-size:.85rem;
+  }
+  .sort-inline{ display:flex; align-items:center; gap:.5rem; font-size:.8rem; }
+  .sort-inline select{ padding:.4rem .6rem; font-size:.82rem; }
+
+  /* ---------- JOB TICKETS ---------- */
+  .results{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+
+  .job-ticket{
+    display:grid;
+    grid-template-columns:1fr 148px;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:0 2px 8px var(--shadow);
+    cursor:pointer;
+    overflow:hidden;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .job-ticket:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 16px var(--shadow);
+  }
+  @media (max-width:640px){
+    .job-ticket{ grid-template-columns:1fr; }
+    .stub{ flex-direction:row !important; justify-content:space-between; border-top:2px dashed var(--line); border-left:none !important; }
+  }
+
+  .ticket-main{
+    padding:1.1rem 1.3rem;
+    position:relative;
+  }
+  .ticket-code{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.7rem;
+    color:var(--ink-soft);
+    letter-spacing:.05em;
+  }
+  .ticket-title{
+    font-size:1.08rem;
+    font-weight:600;
+    margin:.15rem 0 .1rem;
+    color:var(--ink);
+  }
+  .ticket-company{
+    font-size:.9rem;
+    color:var(--ink-soft);
+    margin-bottom:.55rem;
+  }
+  .ticket-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem 1rem;
+    font-size:.8rem;
+    color:var(--ink-soft);
+    margin-bottom:.6rem;
+  }
+  .ticket-meta span{ display:flex; align-items:center; gap:.3rem; }
+  .ticket-skills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem;
+  }
+  .skill-tag{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    font-size:.72rem;
+    padding:.2rem .55rem;
+    border-radius:4px;
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .save-btn{
+    position:absolute;
+    top:1rem;
+    right:1.2rem;
+    background:none;
+    border:none;
+    font-size:1.1rem;
+    cursor:pointer;
+    color:var(--line);
+  }
+  .save-btn.saved{ color:var(--marigold-dark); }
+
+  .stub{
+    border-left:2px dashed var(--line);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:.9rem;
+    gap:.5rem;
+    text-align:center;
+    position:relative;
+  }
+  .stub::before, .stub::after{
+    content:"";
+    position:absolute;
+    width:14px; height:14px;
+    background:var(--paper);
+    border-radius:50%;
+    border:1px solid var(--line);
+    left:-8px;
+  }
+  .stub::before{ top:-8px; }
+  .stub::after{ bottom:-8px; }
+  .stamp{
+    font-family:'Special Elite', monospace;
+    font-size:.78rem;
+    padding:.3rem .5rem;
+    border:2px solid;
+    border-radius:4px;
+    transform:rotate(-4deg);
+    letter-spacing:.05em;
+  }
+  .stamp.confirmed{ color:var(--rail-green-dark); border-color:var(--rail-green); }
+  .stamp.waitlist{ color:var(--maroon-dark); border-color:var(--maroon); }
+  .stamp.rac{ color:var(--marigold-dark); border-color:var(--marigold); }
+  .stub-salary{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:.95rem;
+    color:var(--ink);
+  }
+  .stub-days{
+    font-size:.68rem;
+    color:var(--ink-soft);
+  }
+
+  .empty-state{
+    text-align:center;
+    padding:3.5rem 1rem;
+    color:var(--ink-soft);
+  }
+  .empty-state h3{
+    font-family:'Special Elite', monospace;
+    color:var(--ink);
+    margin-bottom:.4rem;
+  }
+
+  /* ---------- MODAL ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(28,43,57,0.55);
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:3rem 1rem;
+    z-index:100;
+    overflow-y:auto;
+  }
+  .overlay[hidden]{ display:none; }
+  .modal{
+    background:var(--paper);
+    border-radius:12px;
+    max-width:620px;
+    width:100%;
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+    position:relative;
+    border:1px solid var(--line);
+  }
+  .modal-head{
+    background:var(--ink);
+    color:var(--marigold);
+    padding:1.3rem 1.6rem;
+    border-radius:12px 12px 0 0;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute;
+    top:1rem; right:1.2rem;
+    background:none; border:none;
+    color:var(--marigold);
+    font-size:1.3rem;
+    cursor:pointer;
+    line-height:1;
+  }
+  .modal-code{ font-family:'IBM Plex Mono', monospace; font-size:.72rem; color:#C9C2A8; }
+  .modal-head h2{ font-size:1.3rem; margin:.2rem 0 .1rem; }
+  .modal-head .co{ font-size:.95rem; color:#D8CFB2; }
+  .modal-body{ padding:1.5rem 1.6rem; }
+  .modal-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:.9rem;
+    margin-bottom:1.2rem;
+    padding-bottom:1.2rem;
+    border-bottom:1px dashed var(--line);
+  }
+  .modal-grid div{ font-size:.85rem; }
+  .modal-grid label{
+    display:block;
+    font-size:.66rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-bottom:.15rem;
+  }
+  .modal-body h3{ font-size:.95rem; margin-bottom:.4rem; }
+  .modal-body p{ font-size:.88rem; line-height:1.55; color:var(--ink-soft); margin-bottom:1.2rem; }
+  .modal-actions{ display:flex; gap:.7rem; align-items:center; }
+  .apply-btn{
+    background:var(--rail-green);
+    color:var(--white);
+    border:none;
+    padding:.75rem 1.4rem;
+    border-radius:6px;
+    font-weight:600;
+    cursor:pointer;
+    font-size:.92rem;
+  }
+  .apply-btn:hover{ background:var(--rail-green-dark); }
+  .modal-save{
+    background:none;
+    border:1px solid var(--line);
+    padding:.75rem 1rem;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:.85rem;
+    color:var(--ink-soft);
+  }
+  .confirm-msg{
+    margin-top:1rem;
+    background:#E7F0E9;
+    border:1px solid var(--rail-green);
+    color:var(--rail-green-dark);
+    padding:.7rem 1rem;
+    border-radius:6px;
+    font-size:.85rem;
+  }
+  .confirm-msg[hidden]{ display:none; }
+
+  /* ---------- RESERVATIONS DRAWER ---------- */
+  .drawer-toggle{
+    position:fixed;
+    right:1.4rem;
+    bottom:1.4rem;
+    background:var(--maroon);
+    color:var(--white);
+    border:none;
+    border-radius:999px;
+    padding:.8rem 1.2rem;
+    font-weight:600;
+    font-size:.85rem;
+    cursor:pointer;
+    box-shadow:0 6px 16px var(--shadow);
+    z-index:50;
+  }
+  .drawer{
+    position:fixed;
+    top:0; right:0; bottom:0;
+    width:320px;
+    max-width:88vw;
+    background:var(--paper);
+    box-shadow:-6px 0 20px rgba(0,0,0,0.25);
+    z-index:90;
+    transform:translateX(100%);
+    transition:transform .2s ease;
+    overflow-y:auto;
+    padding:1.4rem;
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer h2{
+    font-family:'Special Elite', monospace;
+    font-size:1.05rem;
+    margin-top:0;
+  }
+  .drawer-item{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:.7rem .9rem;
+    margin-bottom:.6rem;
+    font-size:.85rem;
+  }
+  .drawer-item b{ display:block; font-size:.88rem; }
+  .drawer-item .rm{
+    background:none; border:none; color:var(--maroon);
+    font-size:.75rem; cursor:pointer; margin-top:.3rem; padding:0;
+    text-decoration:underline;
+  }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px;
+    padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+</style>
+</head>
+<body>
+
+<header class="board">
+  <div class="board-top">
+    <div class="brand">
+      <span class="brand-mark">Naukri Chart</span>
+      <span class="brand-tag">Openings Reservation System</span>
+    </div>
+    <div class="board-stats">
+      <span><b id="stat-total">0</b> openings on chart</span>
+      <span><b id="stat-cities">0</b> cities</span>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+</header>
+
+<main>
+  <h1 class="sr-only">Search and filter job openings across India</h1>
+
+  <section class="counter">
+    <div class="search-row">
+      <input type="text" id="q" placeholder="Search by role, company, or skill — e.g. 'React developer'" aria-label="Search jobs">
+      <button id="search-btn" type="button">Search</button>
+    </div>
+    <div class="filters">
+      <label>City
+        <select id="f-city"><option value="">All cities</option></select>
+      </label>
+      <label>Category
+        <select id="f-category"><option value="">All categories</option></select>
+      </label>
+      <label>Experience
+        <select id="f-exp"><option value="">Any experience</option></select>
+      </label>
+      <label>Job type
+        <select id="f-type"><option value="">Any type</option></select>
+      </label>
+      <label>Sort by
+        <select id="f-sort">
+          <option value="relevance">Relevance</option>
+          <option value="salary-high">Salary: high to low</option>
+          <option value="salary-low">Salary: low to high</option>
+          <option value="newest">Newest posted</option>
+        </select>
+      </label>
+    </div>
+    <div class="chips" id="quick-chips"></div>
+  </section>
+
+  <div class="chart-head">
+    <h2 id="chart-title">Openings chart</h2>
+    <span class="count" id="result-count">0 positions found</span>
+  </div>
+
+  <div class="results" id="results"></div>
+</main>
+
+<button class="drawer-toggle" id="drawer-toggle" type="button">My reservations (<span id="drawer-count">0</span>)</button>
+
+<aside class="drawer" id="drawer" aria-label="Saved jobs">
+  <h2>My reservations</h2>
+  <p style="font-size:.82rem; color:var(--ink-soft);">Jobs you've pinned in this session. Closing the tab clears this list.</p>
+  <div id="drawer-list"></div>
+</aside>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-code" id="modal-code">JOB CODE</div>
+      <h2 id="modal-title">Job title</h2>
+      <div class="co" id="modal-co">Company · City</div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div><label>Salary</label><span id="modal-salary"></span></div>
+        <div><label>Experience</label><span id="modal-exp"></span></div>
+        <div><label>Job type</label><span id="modal-type"></span></div>
+        <div><label>Openings</label><span id="modal-openings"></span></div>
+      </div>
+      <h3>About the role</h3>
+      <p id="modal-desc"></p>
+      <h3>Skills required</h3>
+      <div class="ticket-skills" id="modal-skills" style="margin-bottom:1.3rem;"></div>
+      <div class="modal-actions">
+        <button class="apply-btn" id="modal-apply" type="button">Apply now</button>
+        <button class="modal-save" id="modal-save" type="button">Pin this job</button>
+      </div>
+      <div class="confirm-msg" id="confirm-msg" hidden>Application noted — the employer's chart has been updated with your name.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  var JOBS = [
+    { id:"BLR-2381-IT", title:"Frontend Developer (React)", company:"Deccan Systems", city:"Bengaluru", category:"IT & Software", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:8, salaryMax:14, posted:2, openings:6, skills:["React","JavaScript","CSS","Git"], desc:"Build and maintain customer-facing dashboards used by clients across the retail and logistics sector. You'll work closely with design and backend teams to ship features every sprint, and help shape the component library used across products." },
+    { id:"MUM-1187-FIN", title:"Financial Analyst", company:"Ganga Fintech", city:"Mumbai", category:"Finance & Accounting", type:"Full-time", exp:"3-5", expLabel:"3-5 yrs", salaryMin:9, salaryMax:15, posted:5, openings:3, skills:["Excel","Financial Modeling","SQL"], desc:"Support the treasury team with monthly forecasting, variance analysis, and board-level reporting. Prior exposure to NBFC or fintech lending books is a strong plus." },
+    { id:"DEL-3342-MKT", title:"Digital Marketing Executive", company:"Konkan Retail Co", city:"Delhi NCR", category:"Sales & Marketing", type:"Full-time", exp:"0", expLabel:"Fresher", salaryMin:3.5, salaryMax:5, posted:1, openings:10, skills:["SEO","Google Ads","Content"], desc:"Run paid campaigns across Meta and Google for a fast-growing D2C brand, and report weekly on CAC and ROAS to the growth lead. Great entry point into performance marketing." },
+    { id:"HYD-9021-DA", title:"Data Analyst", company:"Vindhya Analytics", city:"Hyderabad", category:"Data & Analytics", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:7, salaryMax:12, posted:3, openings:4, skills:["Python","SQL","Power BI","Statistics"], desc:"Turn raw operational data into dashboards the leadership team actually uses. You'll partner directly with the ops and finance functions to define new metrics." },
+    { id:"PUN-5510-IT", title:"Backend Engineer (Node.js)", company:"Sahyadri Cloudworks", city:"Pune", category:"IT & Software", type:"Full-time", exp:"3-5", expLabel:"3-5 yrs", salaryMin:14, salaryMax:22, posted:1, openings:2, skills:["Node.js","PostgreSQL","AWS","Docker"], desc:"Own services powering a payments platform processing several million transactions a month. Expect on-call rotation and a strong emphasis on reliability." },
+    { id:"CHN-7784-HC", title:"Staff Nurse", company:"Nilgiri Health Network", city:"Chennai", category:"Healthcare", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:4, salaryMax:6.5, posted:4, openings:12, skills:["Patient Care","ICU","BLS Certified"], desc:"Provide bedside care across general ward and ICU rotations at a 200-bed multi-specialty hospital. Night shift allowance applies." },
+    { id:"KOL-2290-GOV", title:"Junior Assistant (Clerical)", company:"State Public Services Board", city:"Kolkata", category:"Government & PSU", type:"Full-time", exp:"0", expLabel:"Fresher", salaryMin:3.2, salaryMax:4.8, posted:8, openings:20, skills:["MS Office","Typing","Record Keeping"], desc:"Handle correspondence, filing, and data entry for a state government department. Selection is via written exam followed by document verification." },
+    { id:"AHM-4471-OPS", title:"Operations Executive", company:"Saurashtra Logistics", city:"Ahmedabad", category:"Operations", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:5, salaryMax:7.5, posted:6, openings:5, skills:["Supply Chain","Vendor Management","Excel"], desc:"Coordinate daily dispatch schedules across a fleet of 40+ vehicles and resolve delivery exceptions in real time with warehouse teams." },
+    { id:"RMT-8832-IT", title:"UI/UX Designer", company:"Malabar Design Studio", city:"Remote", category:"Design & Creative", type:"Full-time", exp:"3-5", expLabel:"3-5 yrs", salaryMin:10, salaryMax:16, posted:2, openings:1, skills:["Figma","Prototyping","Design Systems"], desc:"Lead design for a B2B SaaS product used by mid-market manufacturers. You'll run user interviews directly and present findings to founders." },
+    { id:"BLR-6620-DA", title:"Machine Learning Engineer", company:"Vindhya Analytics", city:"Bengaluru", category:"Data & Analytics", type:"Full-time", exp:"5-8", expLabel:"5-8 yrs", salaryMin:22, salaryMax:34, posted:1, openings:2, skills:["Python","PyTorch","MLOps","AWS"], desc:"Build and deploy recommendation models serving live traffic for a consumer app with 5M+ monthly users. Strong ownership of the full ML lifecycle expected." },
+    { id:"MUM-3345-SALES", title:"Business Development Manager", company:"Konkan Retail Co", city:"Mumbai", category:"Sales & Marketing", type:"Full-time", exp:"5-8", expLabel:"5-8 yrs", salaryMin:16, salaryMax:24, posted:7, openings:1, skills:["B2B Sales","Negotiation","CRM"], desc:"Own the enterprise sales pipeline for the western region, carrying a direct revenue target and managing a team of three account executives." },
+    { id:"DEL-9987-HR", title:"HR Generalist", company:"Yamuna Manufacturing", city:"Delhi NCR", category:"HR", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:6, salaryMax:9, posted:3, openings:2, skills:["Recruitment","Payroll","Employee Relations"], desc:"Manage end-to-end recruitment for factory and corporate roles, plus support monthly payroll processing for 300+ employees." },
+    { id:"PUN-1123-CS", title:"Customer Support Associate", company:"Sahyadri Cloudworks", city:"Pune", category:"Customer Support", type:"Full-time", exp:"0", expLabel:"Fresher", salaryMin:3, salaryMax:4.5, posted:2, openings:15, skills:["Communication","Zendesk","Troubleshooting"], desc:"Handle inbound queries over chat and email for a SaaS billing product, with a rotating shift covering US business hours." },
+    { id:"HYD-5567-IT", title:"QA Engineer (Automation)", company:"Deccan Systems", city:"Hyderabad", category:"IT & Software", type:"Full-time", exp:"3-5", expLabel:"3-5 yrs", salaryMin:11, salaryMax:17, posted:5, openings:3, skills:["Selenium","Java","CI/CD"], desc:"Build and maintain the automated regression suite for a healthcare scheduling platform, working closely with release engineering." },
+    { id:"CHN-8834-FIN", title:"Accounts Executive", company:"Cauvery Textiles", city:"Chennai", category:"Finance & Accounting", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:4.5, salaryMax:6.5, posted:9, openings:4, skills:["Tally","GST Filing","Reconciliation"], desc:"Manage day-to-day bookkeeping, vendor reconciliation, and monthly GST filings for a mid-sized export business." },
+    { id:"RMT-2201-IT", title:"DevOps Engineer", company:"Sahyadri Cloudworks", city:"Remote", category:"IT & Software", type:"Contract", exp:"3-5", expLabel:"3-5 yrs", salaryMin:15, salaryMax:20, posted:1, openings:1, skills:["Kubernetes","Terraform","AWS","CI/CD"], desc:"Six-month contract to migrate infrastructure from a single-region EC2 setup to a multi-region Kubernetes deployment." },
+    { id:"BLR-4432-DES", title:"Graphic Design Intern", company:"Malabar Design Studio", city:"Bengaluru", category:"Design & Creative", type:"Internship", exp:"0", expLabel:"Fresher", salaryMin:0.18, salaryMax:0.25, posted:3, openings:3, skills:["Photoshop","Illustrator","Branding"], desc:"Six-month paid internship supporting the brand team on social creatives and pitch decks, with mentorship from senior designers." },
+    { id:"HYD-6673-GOV", title:"Assistant Engineer (Civil)", company:"State Public Services Board", city:"Hyderabad", category:"Government & PSU", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:5.5, salaryMax:8, posted:10, openings:8, skills:["AutoCAD","Site Supervision","Estimation"], desc:"Supervise ongoing road and drainage projects under a municipal infrastructure department, reporting to the executive engineer." },
+    { id:"MUM-7761-HC", title:"Physiotherapist", company:"Nilgiri Health Network", city:"Mumbai", category:"Healthcare", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:5, salaryMax:7.5, posted:4, openings:3, skills:["Rehabilitation","Sports Injury","Patient Assessment"], desc:"Join the outpatient rehabilitation unit, treating a mix of orthopedic and sports-injury cases with a multi-disciplinary team." },
+    { id:"KOL-3392-MKT", title:"Content Writer", company:"Ganga Fintech", city:"Kolkata", category:"Sales & Marketing", type:"Part-time", exp:"0", expLabel:"Fresher", salaryMin:2.5, salaryMax:4, posted:2, openings:2, skills:["Writing","SEO","Research"], desc:"Write explainer articles and product blog posts on personal finance topics for an audience of first-time investors." },
+    { id:"AHM-2298-IT", title:"Senior Software Architect", company:"Deccan Systems", city:"Ahmedabad", category:"IT & Software", type:"Full-time", exp:"8+", expLabel:"8+ yrs", salaryMin:32, salaryMax:48, posted:6, openings:1, skills:["System Design","Java","Microservices","Leadership"], desc:"Define the technical roadmap for a core banking platform serving 40+ regional bank clients, mentoring three engineering leads." },
+    { id:"RMT-5541-CS", title:"Technical Support Engineer", company:"Vindhya Analytics", city:"Remote", category:"Customer Support", type:"Full-time", exp:"1-3", expLabel:"1-3 yrs", salaryMin:6, salaryMax:9, posted:1, openings:4, skills:["SQL","API Debugging","Communication"], desc:"Triage and resolve customer-reported bugs for an analytics platform, working directly with engineering on root-cause fixes." },
+    { id:"PUN-9910-OPS", title:"Warehouse Supervisor", company:"Saurashtra Logistics", city:"Pune", category:"Operations", type:"Full-time", exp:"3-5", expLabel:"3-5 yrs", salaryMin:6.5, salaryMax:9.5, posted:7, openings:2, skills:["Inventory Management","Team Leadership","WMS Software"], desc:"Manage a 60,000 sq ft fulfillment warehouse, overseeing a shift team of 25 and driving accuracy on inbound and outbound stock." },
+    { id:"CHN-6612-HR", title:"Talent Acquisition Specialist", company:"Cauvery Textiles", city:"Chennai", category:"HR", type:"Full-time", exp:"3-5", expLabel:"3-5 yrs", salaryMin:8, salaryMax:12, posted:3, openings:2, skills:["Sourcing","Interviewing","ATS Tools"], desc:"Lead hiring for manufacturing and corporate functions, building a pipeline strategy for hard-to-fill technical roles." }
+  ];
+
+  var saved = {};
+  var currentJobId = null;
+
+  var cities = Array.from(new Set(JOBS.map(function(j){ return j.city; }))).sort();
+  var categories = Array.from(new Set(JOBS.map(function(j){ return j.category; }))).sort();
+  var types = Array.from(new Set(JOBS.map(function(j){ return j.type; }))).sort();
+  var expOrder = ["0","1-3","3-5","5-8","8+"];
+  var expLabels = { "0":"Fresher", "1-3":"1-3 yrs", "3-5":"3-5 yrs", "5-8":"5-8 yrs", "8+":"8+ yrs" };
+
+  function fillSelect(id, values, labelFn){
+    var sel = document.getElementById(id);
+    values.forEach(function(v){
+      var opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = labelFn ? labelFn(v) : v;
+      sel.appendChild(opt);
+    });
+  }
+  fillSelect("f-city", cities);
+  fillSelect("f-category", categories);
+  fillSelect("f-type", types);
+  fillSelect("f-exp", expOrder, function(v){ return expLabels[v]; });
+
+  document.getElementById("stat-total").textContent = JOBS.length;
+  document.getElementById("stat-cities").textContent = cities.length;
+
+  var tickerItems = ["IT & Software hiring surge in Bengaluru", "Fresher openings up in Government & PSU", "Remote roles rising across Data & Analytics", "Healthcare openings steady in Chennai", "Finance hiring picks up in Mumbai"];
+  document.getElementById("ticker-track").innerHTML = tickerItems.map(function(t){ return "<span>" + t + "</span>"; }).join("");
+
+  var quickChips = ["Remote", "Fresher", "Internship", "Government & PSU", "IT & Software"];
+  var chipWrap = document.getElementById("quick-chips");
+  quickChips.forEach(function(label){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = label;
+    b.addEventListener("click", function(){
+      var isActive = b.classList.contains("active");
+      Array.from(chipWrap.children).forEach(function(c){ c.classList.remove("active"); });
+      if (isActive){ resetFilters(); return; }
+      b.classList.add("active");
+      applyQuickChip(label);
+    });
+    chipWrap.appendChild(b);
+  });
+
+  function resetFilters(){
+    document.getElementById("f-city").value = "";
+    document.getElementById("f-category").value = "";
+    document.getElementById("f-exp").value = "";
+    document.getElementById("f-type").value = "";
+    render();
+  }
+
+  function applyQuickChip(label){
+    document.getElementById("f-city").value = "";
+    document.getElementById("f-category").value = "";
+    document.getElementById("f-exp").value = "";
+    document.getElementById("f-type").value = "";
+    if (label === "Remote") document.getElementById("f-city").value = "Remote";
+    else if (label === "Fresher") document.getElementById("f-exp").value = "0";
+    else if (label === "Internship") document.getElementById("f-type").value = "Internship";
+    else document.getElementById("f-category").value = label;
+    render();
+  }
+
+  function daysAgoLabel(n){
+    if (n === 0) return "Posted today";
+    if (n === 1) return "Posted 1 day ago";
+    return "Posted " + n + " days ago";
+  }
+
+  function stampFor(job){
+    if (job.city === "Remote" && job.openings <= 2) return { cls:"rac", label:"RAC" };
+    if (job.openings > 5) return { cls:"confirmed", label:"CONFIRMED" };
+    return { cls:"waitlist", label:"WAITLIST" };
+  }
+
+  function getFiltered(){
+    var q = document.getElementById("q").value.trim().toLowerCase();
+    var city = document.getElementById("f-city").value;
+    var category = document.getElementById("f-category").value;
+    var exp = document.getElementById("f-exp").value;
+    var type = document.getElementById("f-type").value;
+    var sort = document.getElementById("f-sort").value;
+
+    var list = JOBS.filter(function(j){
+      if (q){
+        var hay = (j.title + " " + j.company + " " + j.skills.join(" ")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      if (city && j.city !== city) return false;
+      if (category && j.category !== category) return false;
+      if (exp && j.exp !== exp) return false;
+      if (type && j.type !== type) return false;
+      return true;
+    });
+
+    if (sort === "salary-high") list.sort(function(a,b){ return b.salaryMax - a.salaryMax; });
+    else if (sort === "salary-low") list.sort(function(a,b){ return a.salaryMax - b.salaryMax; });
+    else if (sort === "newest") list.sort(function(a,b){ return a.posted - b.posted; });
+
+    return list;
+  }
+
+  function render(){
+    var list = getFiltered();
+    var results = document.getElementById("results");
+    results.innerHTML = "";
+    document.getElementById("result-count").textContent = list.length + (list.length === 1 ? " position found" : " positions found");
+
+    if (list.length === 0){
+      results.innerHTML = "<div class='empty-state'><h3>No berths available on this route</h3><p>Try clearing a filter or searching a different keyword.</p></div>";
+      return;
+    }
+
+    list.forEach(function(job){
+      var stamp = stampFor(job);
+      var card = document.createElement("article");
+      card.className = "job-ticket";
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", "Open details for " + job.title + " at " + job.company);
+
+      var isSaved = !!saved[job.id];
+
+      card.innerHTML =
+        "<div class='ticket-main'>" +
+          "<button class='save-btn" + (isSaved ? " saved" : "") + "' data-job='" + job.id + "' aria-label='Pin this job' title='Pin this job'>" + (isSaved ? "\u2605" : "\u2606") + "</button>" +
+          "<div class='ticket-code'>" + job.id + "</div>" +
+          "<div class='ticket-title'>" + job.title + "</div>" +
+          "<div class='ticket-company'>" + job.company + " &middot; " + job.city + "</div>" +
+          "<div class='ticket-meta'>" +
+            "<span>" + job.expLabel + "</span>" +
+            "<span>" + job.type + "</span>" +
+            "<span>" + job.openings + " opening" + (job.openings > 1 ? "s" : "") + "</span>" +
+          "</div>" +
+          "<div class='ticket-skills'>" + job.skills.map(function(s){ return "<span class='skill-tag'>" + s + "</span>"; }).join("") + "</div>" +
+        "</div>" +
+        "<div class='stub'>" +
+          "<div class='stamp " + stamp.cls + "'>" + stamp.label + "</div>" +
+          "<div class='stub-salary'>" + fmtSalary(job) + "</div>" +
+          "<div class='stub-days'>" + daysAgoLabel(job.posted) + "</div>" +
+        "</div>";
+
+      card.addEventListener("click", function(e){
+        if (e.target.closest(".save-btn")) return;
+        openModal(job.id);
+      });
+      card.addEventListener("keydown", function(e){
+        if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openModal(job.id); }
+      });
+
+      results.appendChild(card);
+    });
+
+    Array.from(document.querySelectorAll(".save-btn")).forEach(function(btn){
+      btn.addEventListener("click", function(e){
+        e.stopPropagation();
+        toggleSave(btn.getAttribute("data-job"));
+      });
+    });
+  }
+
+  function fmtSalary(job){
+    if (job.salaryMax < 1) return "\u20B9" + Math.round(job.salaryMin*100000).toLocaleString('en-IN') + "/mo";
+    return "\u20B9" + job.salaryMin + "\u2013" + job.salaryMax + " LPA";
+  }
+
+  function toggleSave(id){
+    if (saved[id]) delete saved[id];
+    else saved[id] = true;
+    render();
+    renderDrawer();
+    updateModalSaveLabel();
+  }
+
+  function renderDrawer(){
+    var ids = Object.keys(saved);
+    document.getElementById("drawer-count").textContent = ids.length;
+    var list = document.getElementById("drawer-list");
+    if (ids.length === 0){
+      list.innerHTML = "<p style='font-size:.85rem; color:var(--ink-soft);'>No jobs pinned yet. Tap the star on any listing to reserve it here.</p>";
+      return;
+    }
+    list.innerHTML = "";
+    ids.forEach(function(id){
+      var job = JOBS.find(function(j){ return j.id === id; });
+      if (!job) return;
+      var div = document.createElement("div");
+      div.className = "drawer-item";
+      div.innerHTML = "<b>" + job.title + "</b>" + job.company + " &middot; " + job.city + "<br>" +
+        "<button class='rm' data-job='" + id + "'>Remove</button>";
+      list.appendChild(div);
+    });
+    Array.from(list.querySelectorAll(".rm")).forEach(function(btn){
+      btn.addEventListener("click", function(){ toggleSave(btn.getAttribute("data-job")); });
+    });
+  }
+
+  function openModal(id){
+    var job = JOBS.find(function(j){ return j.id === id; });
+    if (!job) return;
+    currentJobId = id;
+    document.getElementById("modal-code").textContent = job.id;
+    document.getElementById("modal-title").textContent = job.title;
+    document.getElementById("modal-co").textContent = job.company + " \u00B7 " + job.city;
+    document.getElementById("modal-salary").textContent = fmtSalary(job);
+    document.getElementById("modal-exp").textContent = job.expLabel;
+    document.getElementById("modal-type").textContent = job.type;
+    document.getElementById("modal-openings").textContent = job.openings;
+    document.getElementById("modal-desc").textContent = job.desc;
+    document.getElementById("modal-skills").innerHTML = job.skills.map(function(s){ return "<span class='skill-tag'>" + s + "</span>"; }).join("");
+    document.getElementById("confirm-msg").hidden = true;
+    updateModalSaveLabel();
+    document.getElementById("overlay").hidden = false;
+    document.getElementById("modal-close").focus();
+  }
+
+  function updateModalSaveLabel(){
+    var btn = document.getElementById("modal-save");
+    if (!currentJobId) return;
+    btn.textContent = saved[currentJobId] ? "Unpin this job" : "Pin this job";
+  }
+
+  document.getElementById("modal-close").addEventListener("click", closeModal);
+  document.getElementById("overlay").addEventListener("click", function(e){
+    if (e.target.id === "overlay") closeModal();
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape") closeModal();
+  });
+  function closeModal(){ document.getElementById("overlay").hidden = true; currentJobId = null; }
+
+  document.getElementById("modal-apply").addEventListener("click", function(){
+    document.getElementById("confirm-msg").hidden = false;
+  });
+  document.getElementById("modal-save").addEventListener("click", function(){
+    if (currentJobId) toggleSave(currentJobId);
+  });
+
+  document.getElementById("drawer-toggle").addEventListener("click", function(){
+    document.getElementById("drawer").classList.toggle("open");
+  });
+
+  ["f-city","f-category","f-exp","f-type","f-sort"].forEach(function(id){
+    document.getElementById(id).addEventListener("change", function(){
+      Array.from(chipWrap.children).forEach(function(c){ c.classList.remove("active"); });
+      render();
+    });
+  });
+  document.getElementById("search-btn").addEventListener("click", render);
+  document.getElementById("q").addEventListener("keydown", function(e){
+    if (e.key === "Enter") render();
+  });
+
+  render();
+  renderDrawer();
+
+})();
+</script>
+</body>
+</html>
